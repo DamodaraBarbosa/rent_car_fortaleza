@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from bs4 import BeautifulSoup
+
 import pandas as pd
 from time import sleep
 
@@ -12,7 +12,6 @@ options = Options()
 options.add_argument('window-size= 400, 800')
 browser = webdriver.Chrome(options= options)
 browser.get('https://www.rentcars.com/pt-br/')
-rent_car = BeautifulSoup(browser.page_source, 'html.parser')
 timeout = 3
 
 # três segundos para garantir que a página carregue:
@@ -50,7 +49,17 @@ WebDriverWait(browser, timeout).until(
 # tempo que as opções de carro carreguem:
 sleep(30)
 
-print(rent_car.prettify())
+cars = list()
+last_height = browser.execute_script('return document.body.scrollHeight')
+# a quantidade de carros disponíveis obtida na página é uma string que é fatiada e convertida para int:
+cars_count = int(browser.find_element(By.XPATH, '//div[@class= "filter_sort__counter_2M0zUC3N"]').text[:3])
+
+while len(cars) <= cars_count:
+    browser.execute_script('window.scrollTo(0, document.body.scrollHeight)')
+
+    sleep(1)
+
+browser.quit()
 
 
 # search_buttom = browser.find_element(By.XPATH, '//*[@id="formPesquisa"]/div[5]/button')
