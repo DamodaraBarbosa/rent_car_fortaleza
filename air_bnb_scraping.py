@@ -47,7 +47,7 @@ WebDriverWait(browser, timeout).until(
 ).click()
 
 # tempo que as opções de carro carreguem:
-sleep(30)
+sleep(25)
 
 dict_car = dict()
 list_cars = list()
@@ -68,14 +68,25 @@ while len(list_cars) <= cars_count:
     last_height = new_height
 
     cars = browser.find_elements(By.XPATH, '//section[@id]')
-    
-    for car in cars:
-        if 'card' in car.get_attribute('id'):
-            model = (car.find_element(By.XPATH, '//h2[@data-gtm-event]').text).split()
-            dict_car['model'] = model[0]
-            dict_car['brand'] = model[1]
-            
-        list_cars.append(dict_car.copy())
+
+    for index, car in enumerate(cars):
+        if index == 5:
+            if 'card' in car.get_attribute('id'):
+                model = (car.find_element(By.XPATH, '//h2[@data-gtm-event]').text).split()
+                dict_car['model'] = model[1]
+                dict_car['brand'] = model[0]
+                dict_car['category'] = car.find_element(
+                    By.XPATH, '//span[@class= "card-result__header-category_3I38Oj2x"]'
+                ).text
+                rental_img = browser.find_element(By.XPATH, '//div[@class= "rental_1vvswSUn"]//img')
+                dict_car['car_rental'] = rental_img.get_attribute('alt')
+                dict_car['car_rental_review'] = browser.find_element(
+                    By.XPATH, '//span[@class= "review-indice_2AMfvnVl"]'
+                ).text
+
+                features = browser.find_elements(By.XPATH, '//ul[@class= "features-list_377lEgCb"]')
+                
+                list_cars.append(dict_car.copy())
 
 print(list_cars)
 print(len(list_cars))
