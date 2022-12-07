@@ -49,15 +49,36 @@ WebDriverWait(browser, timeout).until(
 # tempo que as opções de carro carreguem:
 sleep(30)
 
-cars = list()
+dict_car = dict()
+list_cars = list()
 last_height = browser.execute_script('return document.body.scrollHeight')
 # a quantidade de carros disponíveis obtida na página é uma string que é fatiada e convertida para int:
 cars_count = int(browser.find_element(By.XPATH, '//div[@class= "filter_sort__counter_2M0zUC3N"]').text[:3])
 
-while len(cars) <= cars_count:
+while len(list_cars) <= cars_count:
     browser.execute_script('window.scrollTo(0, document.body.scrollHeight)')
 
     sleep(1)
+
+    new_height = browser.execute_script('return document.body.scrollHeight')
+
+    if new_height == last_height:
+        break
+
+    last_height = new_height
+
+    cars = browser.find_elements(By.XPATH, '//section[@id]')
+    
+    for car in cars:
+        if 'card' in car.get_attribute('id'):
+            model = (car.find_element(By.XPATH, '//h2[@data-gtm-event]').text).split()
+            dict_car['model'] = model[0]
+            dict_car['brand'] = model[1]
+            
+        list_cars.append(dict_car.copy())
+
+print(list_cars)
+print(len(list_cars))
 
 browser.quit()
 
